@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookHunt - Home</title>
+</head>
+<body>
+    <h1>BookHunt</h1>
+    
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="{{ url_for('recommendations_page') }}">Recommendations</a> |
+        <a href="{{ url_for('past_reads_page') }}">Previously Read</a> |
+        <a href="{{ url_for('reading_list_page') }}">Reading List</a>
+    </nav>
+    
+    <h2>Books List</h2>
+    <ul>
+        {% for book in books %}
+        <li>
+            <a href="{{ url_for('book_details', book_id=book.id) }}">
+                {{ book.title }} by {{ book.author.name if book.author else "Unknown Author" }}
+            </a>
+        </li>
+        {% else %}
+        <li>No books available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

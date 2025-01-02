@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading List</title>
+</head>
+<body>
+    <h1>Your Reading List</h1>
+    
+    {% if user_books %}
+    <ul>
+        {% for user_book in user_books %}
+        <li>
+            {{ user_book.book.title if user_book.book else "Unknown Book" }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Your reading list is empty.</p>
+    {% endif %}
+</body>
+</html>

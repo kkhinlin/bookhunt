@@ -1,0 +1,68 @@
+<!-- past_reads.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Reads</title>
+</head>
+<body>
+    <h1>Your Past Reads</h1>
+    
+    <h2>Add a Past Read</h2>
+    <form id="add-past-read-form">
+        <label for="book_id">Book ID:</label>
+        <input type="text" id="book_id" name="book_id" required><br><br>
+        
+        <label for="opinion">Opinion:</label>
+        <textarea id="opinion" name="opinion"></textarea><br><br>
+        
+        <button type="submit">Add Past Read</button>
+    </form>
+    
+    <h2>Your Past Reads List</h2>
+    <ul id="books-list"></ul>
+
+    <script>
+        async function fetchPastReads() {
+            const response = await fetch('/api/past_reads');
+            const books = await response.json();
+            const booksList = document.getElementById('books-list');
+            
+            books.forEach(book => {
+                const li = document.createElement('li');
+                li.textContent = `Book ID: ${book.book_id}, Status: ${book.status}, Opinion: ${book.opinion}`;
+                booksList.appendChild(li);
+            });
+        }
+
+        document.getElementById('add-past-read-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const book_id = document.getElementById('book_id').value;
+            const opinion = document.getElementById('opinion').value;
+
+            const response = await fetch('/api/past_reads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    book_id: book_id,
+                    status: 'read',  // Assuming the status is always "read" for past reads
+                    opinion: opinion
+                })
+            });
+
+            const result = await response.json();
+            if (result.message === "Past read added successfully") {
+                alert("Your past read has been added!");
+                fetchPastReads();  // Refresh the list of past reads
+            } else {
+                alert("An error occurred!");
+            }
+        });
+
+        fetchPastReads();  // Load the list of past reads when the page loads
+    </script>
+</body>
+</html>

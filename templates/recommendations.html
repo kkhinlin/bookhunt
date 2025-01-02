@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendations</title>
+</head>
+<body>
+    <h1>Book Recommendations</h1>
+    
+    <form method="GET" action="{{ url_for('recommendations_page') }}">
+        <input type="text" name="query" placeholder="Enter a query..." value="{{ query }}">
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    {% if books %}
+    <ul>
+        {% for book in books %}
+        <li>{{ book.title }} by {{ book.author.name if book.author else "Unknown Author" }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No recommendations available. Try searching for something!</p>
+    {% endif %}
+</body>
+</html>
+

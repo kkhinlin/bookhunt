@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - BookHunt</title>
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+    <p><strong>Author:</strong> {{ book.author.name }}</p>
+    <p><strong>Genre:</strong> {{ book.genre.name }}</p>
+    <p><strong>Published Year:</strong> {{ book.published_year }}</p>
+    <p><strong>Description:</strong> {{ book.description }}</p>
+    
+    <h3>Reviews</h3>
+    <ul>
+        {% for review in book.reviews %}
+            <li>
+                <strong>Rating:</strong> {{ review.rating }}<br>
+                <strong>Comment:</str``````ong> {{ review.comment }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
