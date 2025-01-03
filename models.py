@@ -12,6 +12,7 @@ class Book(db.Model):
     description = db.Column(db.Text)
     average_rating = db.Column(db.Float, default=0.0)
     published_year = db.Column(db.Integer)
+    number_of_pages = db.Column(db.Integer)  # New column to store the number of pages
     
     # Foreign Keys
     author_id = db.Column(db.String(36), db.ForeignKey('authors.id'))
@@ -53,8 +54,9 @@ class UserBooks(db.Model):
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     book_id = db.Column(db.String(36), db.ForeignKey('books.id'), nullable=False)
-    status = db.Column(db.String(50), nullable=False)  # E.g., "read", "reading", "wishlist"
+    status = db.Column(db.String(50), nullable=False)  
     opinion = db.Column(db.Text)
+    feedback = db.Column(db.String(50), nullable=True)  
 
     # Relationships
     book = db.relationship('Book', backref=db.backref('user_books', lazy=True))

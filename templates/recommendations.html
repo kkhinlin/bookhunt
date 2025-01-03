@@ -4,24 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Recommendations</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .book-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .book-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .book-author {
+            font-style: italic;
+        }
+        .book-description {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+        .feedback-btn {
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Book Recommendations</h1>
-    
-    <form method="GET" action="{{ url_for('recommendations_page') }}">
-        <input type="text" name="query" placeholder="Enter a query..." value="{{ query }}">
-        <button type="submit">Get Recommendations</button>
-    </form>
+    <div class="container mt-4">
+        <h1>Book Recommendations</h1>
 
-    {% if books %}
-    <ul>
-        {% for book in books %}
-        <li>{{ book.title }} by {{ book.author.name if book.author else "Unknown Author" }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No recommendations available. Try searching for something!</p>
-    {% endif %}
+        <!-- Form for entering book query -->
+        <form method="get" action="/recommendations">
+            <div class="form-group">
+                <label for="query">Enter a Book or Topic:</label>
+                <input type="text" class="form-control" id="query" name="query" placeholder="e.g., 'Fantasy novels' or 'Harry Potter'" value="{{ query }}">
+            </div>
+            <div class="form-group">
+                <label for="genre">Genre (Optional):</label>
+                <input type="text" class="form-control" id="genre" name="genre" placeholder="e.g., 'Fantasy'" value="{{ genre }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Get Recommendations</button>
+        </form>
+
+        <!-- Display the search query if it exists -->
+        {% if query %}
+            <p><strong>Recommendations for: </strong>"{{ query }}"</p>
+        {% endif %}
+
+        <div class="row">
+            {% if books %}
+                {% for book in books %}
+                    <div class="col-md-4">
+                        <div class="book-card">
+                            <h3 class="book-title">{{ book.title }}</h3>
+                            <p class="book-author">By: {{ book.author.name if book.author else "Unknown Author" }}</p>
+                            <p class="book-description">{{ book.description if book.description else "No description available." }}</p>
+
+                            <!-- Feedback buttons for each book -->
+                            <div>
+                                <button class="btn btn-success feedback-btn" onclick="sendFeedback('{{ book.id }}', 'accept')">Accept</button>
+                                <button class="btn btn-danger feedback-btn" onclick="sendFeedback('{{ book.id }}', 'reject')">Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No recommendations available for this query.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        function sendFeedback(bookId, feedback) {
+            const userId = 1; // Set this dynamically based on logged-in user (for now hardcoded)
+            $.ajax({
+                url: '/api/feedback',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ user_id: userId, book_id: bookId, feedback: feedback }),
+                success: function(response) {
+                    alert('Feedback recorded successfully!');
+                },
+                error: function() {
+                    alert('Error recording feedback.');
+                }
+            });
+        }
+    </script>
 </body>
 </html>
-

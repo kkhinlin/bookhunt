@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from models import db, Book, Review, Genre, Author, UserBooks
 from schemas import BookSchema, ReviewSchema, GenreSchema, AuthorSchema
 from config import Config
-from recommendations import get_recommendations
+from recommendations import get_recommendations, record_feedback  # Import the record_feedback function
 from routes import api
 from flask_migrate import Migrate
 
@@ -78,12 +78,31 @@ def get_author(author_id):
 @app.route('/api/recommend', methods=['GET'])
 def recommend_books():
     query = request.args.get('query', '').strip()
+    genre = request.args.get('genre', '')  # You can filter by genre here if desired
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
 
+    # Get past books the user has interacted with
+    user_books = UserBooks.query.filter_by(status="read").all()
     books = Book.query.all()
-    recommended_books = get_recommendations(query, books)
+    
+    # Generate recommendations
+    recommended_books = get_recommendations(query, books, user_books, genre)
+    
     return books_schema.jsonify(recommended_books)
+
+# Feedback Route
+@app.route('/api/feedback', methods=['POST'])
+def handle_feedback():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    book_id = data.get('book_id')
+    feedback = data.get('feedback')  # 'accept' or 'reject'
+    
+    # Store feedback using the new function
+    record_feedback(user_id, book_id, feedback)
+    
+    return jsonify({"message": "Feedback recorded successfully"}), 200
 
 # Frontend Routes
 @app.route('/')
@@ -93,9 +112,20 @@ def home():
 @app.route('/recommendations', methods=['GET'])
 def recommendations_page():
     query = request.args.get('query', '').strip()
+    genre = request.args.get('genre', '').strip()
+
+    print(f"Query: {query}, Genre: {genre}")  # For debugging
+
+    # Get past books the user has interacted with
+    user_books = UserBooks.query.filter_by(status="read").all()
     books = Book.query.all()
-    recommended_books = get_recommendations(query, books) if query else []
-    return render_template('recommendations.html', books=recommended_books, query=query)
+
+    recommended_books = get_recommendations(query, books, user_books, genre) if query else []
+
+    # Debugging: Print the number of recommended books
+    print(f"Number of recommendations: {len(recommended_books)}")
+
+    return render_template('recommendations.html', books=recommended_books, query=query, genre=genre)
 
 @app.route('/past_reads', methods=['GET', 'POST'])
 def past_reads_page():

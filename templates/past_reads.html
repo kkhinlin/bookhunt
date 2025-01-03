@@ -21,7 +21,8 @@
     </form>
     
     <h2>Your Past Reads List</h2>
-    <ul id="books-list"></ul>
+    <ul id="books-list">
+    </ul>
 
     <script>
         async function fetchPastReads() {
@@ -56,7 +57,8 @@
             const result = await response.json();
             if (result.message === "Past read added successfully") {
                 alert("Your past read has been added!");
-                fetchPastReads();  // Refresh the list of past reads
+                location.reload();
+                //fetchPastReads();  // Refresh the list of past reads
             } else {
                 alert("An error occurred!");
             }
